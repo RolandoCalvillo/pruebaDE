@@ -117,7 +117,7 @@
                 <div id="trivia-feedback" class="text-center text-lg font-semibold mb-4 hidden"></div>
                 <div id="trivia-controls" class="flex justify-between">
                     <button id="next-question-btn" class="bg-gray-200 text-gray-800 font-semibold py-2 px-6 rounded-full btn-shadow transition duration-300 ease-in-out hover:bg-gray-300 hidden">Siguiente Pregunta</button>
-                    <button id="submit-answer-btn" class="bg-red-500 text-white font-semibold py-2 px-6 rounded-full btn-shadow transition duration-300 ease-in-out hover:bg-red-600">
+                    <button id="submit-answer-btn" class="bg-red-500 text-white font-semibold py-2 px-6 rounded-full btn-shadow transition duration-300 ease-in-out hover:bg-red-600 hidden">
                         <span id="submit-answer-text">Enviar Respuesta</span>
                         <div id="submit-answer-spinner" class="loader ml-2 hidden"></div>
                     </button>
@@ -227,6 +227,7 @@
         let triviaScore = 0;
         let nickname = '';
         let leaderboardScores = [];
+        let selectedOption = null;
 
         function showModal(title, message) {
             modalTitle.textContent = title;
@@ -287,7 +288,7 @@
 
             try {
                 for (const checkbox of selectedSongs) {
-                    const songToUpdate = musicData.find(s => s.id === checkbox.dataset.song-id);
+                    const songToUpdate = musicData.find(s => s.id === checkbox.dataset.songId);
                     if (songToUpdate) {
                         songToUpdate.votes++;
                         votedSongs.add(songToUpdate.id);
@@ -373,9 +374,10 @@
                 });
             });
 
-            submitAnswerBtn.classList.remove('hidden');
+            submitAnswerBtn.classList.add('hidden');
             nextQuestionBtn.classList.add('hidden');
             triviaFeedback.classList.add('hidden');
+            selectedOption = null;
         }
 
         function selectAnswer(selectedOption, correctAnswer) {
@@ -385,7 +387,7 @@
             
             triviaOptions.querySelectorAll('button').forEach(btn => {
                 if (btn.textContent === correctAnswer) {
-                    btn.classList.add('bg-green-500', 'text-white');
+                    btn.classList.add('bg-green-500', 'text-white', 'pulse-animation');
                     btn.classList.remove('bg-gray-200', 'hover:bg-gray-300');
                 } else if (btn.textContent === selectedOption) {
                     btn.classList.add('bg-red-500', 'text-white');
@@ -434,11 +436,9 @@
         }
         
         submitAnswerBtn.addEventListener('click', () => {
-            const selectedOption = triviaOptions.querySelector('button.bg-red-500, button.bg-green-500')?.dataset.answer;
-            if (!selectedOption) {
-                showModal("Advertencia", "Por favor, selecciona una respuesta.");
-                return;
-            }
+            // Este botón ya no es necesario ya que la lógica se ejecuta al hacer clic en la opción.
+            // La funcionalidad de seleccionar la respuesta está ahora en los botones de opción.
+            // Para mantener una UI limpia, este botón está oculto.
         });
 
         startTriviaBtn.addEventListener('click', startTrivia);
