@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuestra Historia, Nuestra Música - Mariana y Rogelio</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* Tailwind gray-50 */
+        }
+        /* Modal is hidden by default and only shown by JS */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+            justify-content: center; /* Center horizontally */
+            align-items: center; /* Center vertically */
+            opacity: 0; /* For fade-in animation */
+            transition: opacity 0.3s ease-in-out;
+        }
+        .modal.active {
+            opacity: 1;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border-radius: 1rem;
+            width: 80%;
+            max-width: 500px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            text-align: center;
+            transform: scale(0.9); /* For scale-in animation */
+            transition: transform 0.3s ease-in-out;
+        }
+        .modal.active .modal-content {
+            transform: scale(1);
+        }
+
+        .section-content {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+        }
+        .section-content.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        /* Custom styles for better aesthetics */
+        .card {
+            background-color: white;
+            border-radius: 1.5rem; /* rounded-xl */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+            padding: 1.5rem; /* p-6 */
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 25px -5px rgba(0, 0, 0, 0.1), 0 6px 10px -3px rgba(0, 0, 0, 0.07);
+        }
+        .btn-primary {
+            background-color: #ef4444; /* Tailwind red-500 */
+            color: white;
+            padding: 0.75rem 1.5rem; /* py-3 px-6 */
+            border-radius: 0.75rem; /* rounded-xl */
+            font-weight: 600; /* font-semibold */
+            transition: background-color 0.3s ease, transform 0.1s ease-out;
+        }
+        .btn-primary:hover {
+            background-color: #dc2626; /* Tailwind red-600 */
+            transform: translateY(-2px);
+        }
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        .btn-secondary {
+            background-color: #e2e8f0; /* Tailwind gray-200 */
+            color: #334155; /* Tailwind slate-700 */
+            padding: 0.5rem 1rem; /* py-2 px-4 */
+            border-radius: 0.5rem; /* rounded-lg */
+            font-weight: 500; /* font-medium */
+            transition: background-color 0.3s ease, transform 0.1s ease-out;
+        }
+        .btn-secondary:hover {
+            background-color: #cbd5e1; /* Tailwind gray-300 */
+            transform: translateY(-2px);
+        }
+        .btn-secondary:active {
+            transform: translateY(0);
+        }
+        .input-field {
+            border: 1px solid #e2e8f0; /* Tailwind gray-200 */
+            padding: 0.75rem 1rem; /* py-3 px-4 */
+            border-radius: 0.75rem; /* rounded-xl */
+            width: 100%;
+            outline: none;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .input-field:focus {
+            border-color: #ef4444; /* Tailwind red-500 */
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.3); /* red-500 with opacity */
+        }
+        .tab-button {
+            background-color: transparent; /* Changed for elegance */
+            color: #fefefe; /* White text for nav bar */
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            opacity: 0.8; /* Slightly less opaque when not active */
+        }
+        .tab-button:hover:not(.active) {
+            background-color: rgba(255, 255, 255, 0.1); /* Subtle white hover */
+            opacity: 1;
+        }
+        .tab-button.active {
+            background-color: white; /* Active tab is solid white */
+            color: #ef4444; /* Red text on active tab */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            position: relative;
+            z-index: 10;
+            opacity: 1;
+        }
+        .dedication-box {
+            background-color: #fef3c7; /* Tailwind amber-100 */
+            border-left: 4px solid #f59e0b; /* Tailwind amber-500 */
+            color: #b45309; /* Tailwind amber-700 */
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            margin-top: 0.5rem;
+            position: absolute; /* Position relative to .song-item */
+            left: 0;
+            right: 0;
+            top: calc(100% + 5px); /* Position below the song item with a small gap */
+            z-index: 10;
+            opacity: 0;
+            transform: translateY(-10px); /* Start slightly above */
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+            pointer-events: none; /* Allows clicks on elements behind it when hidden */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .song-item:hover .dedication-box {
+            opacity: 1;
+            transform: translateY(0); /* Slide into view */
+        }
+        .loading-spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #fff;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer; /* Ensure cursor changes on hover */
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        /* Animation for vote count */
+        .vote-count-animated {
+            animation: pulse-vote 0.5s ease-out;
+        }
+        @keyframes pulse-vote {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); color: #ef4444; } /* Slightly larger and redder */
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 antialiased min-h-screen flex flex-col">
+
+    <!-- Modal para mensajes -->
+    <div id="messageModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <p id="modalMessage" class="text-lg font-semibold mb-4"></p>
+            <button id="modalAcceptBtn" class="btn-primary">Aceptar</button>
+        </div>
+    </div>
+
+    <header class="bg-white shadow-sm p-4 sticky top-0 z-50">
+        <div class="container mx-auto flex flex-col sm:flex-row items-center justify-between">
+            <h1 class="text-3xl font-bold text-red-500 mb-4 sm:mb-0">💖 Nuestra Historia, Nuestra Música <br class="sm:hidden"> Boda de Mariana y Rogelio 🎶</h1>
+            <div id="userIdDisplay" class="text-gray-600 text-sm">Tu ID de Invitado: Cargando...</div>
+        </div>
+    </header>
+
+    <nav class="bg-red-500 p-2 shadow-md">
+        <div class="container mx-auto flex justify-center space-x-2 sm:space-x-4 overflow-x-auto py-2">
+            <button class="tab-button active" data-section="music">🎵 Música para Ensamble</button>
+            <button class="tab-button" data-section="story">📖 Nuestra Historia</button>
+            <button class="tab-button" data-section="trivia">🧠 Trivia de Amor</button>
+        </div>
+    </nav>
+
+    <main class="container mx-auto px-4 py-8 flex-grow">
+        <!-- Sección: Música para Dolce Ensamble -->
+        <section id="music-section" class="section-content active">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">🎵 Elije la Música para Dolce Ensamble 🎻</h2>
+            <p class="text-center text-gray-600 mb-8 max-w-2xl mx-auto">¡Ayúdanos a crear la banda sonora de nuestra celebración! Selecciona tus canciones favoritas de la lista.</p>
+
+            <div class="card p-6">
+                <h3 class="text-2xl font-semibold text-gray-700 mb-4">Lista de Canciones y Votos</h3>
+                <p class="text-gray-600 mb-4">Las canciones se muestran ordenadas por popularidad. Selecciona las que te gustaría escuchar y envía tus votos:</p>
+                <div id="songRequestsList" class="space-y-4 max-h-96 overflow-y-auto mb-6">
+                    <!-- Las canciones con checkboxes y votos se cargarán aquí dinámicamente -->
+                    <p class="text-center text-gray-500" id="noSongsMessage">Cargando canciones... Asegúrate de que los novios hayan añadido canciones a la base de datos.</p>
+                </div>
+                <button id="submitVotesBtn" class="btn-primary w-full flex items-center justify-center">
+                    <span id="submitVotesText">Enviar Votos</span>
+                    <div id="submitVotesSpinner" class="loading-spinner ml-2 hidden"></div>
+                </button>
+            </div>
+        </section>
+
+        <!-- Sección: Story Telling de los Novios -->
+        <section id="story-section" class="section-content">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">📖 Nuestra Historia: La Banda Sonora del Amor ❤️</h2>
+            <p class="text-center text-gray-600 mb-8 max-w-2xl mx-auto">Descubre las canciones que han marcado los momentos más especiales de nuestra relación. Cada una tiene una anécdota única.</p>
+
+            <div id="storySongsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Las canciones de la historia se cargarán aquí dinámicamente -->
+                <p class="text-center text-gray-500 col-span-full" id="noStorySongsMessage">Cargando nuestra historia musical...</p>
+            </div>
+        </section>
+
+        <!-- Sección: Trivia de Amor -->
+        <section id="trivia-section" class="section-content">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">🧠 Trivia de Amor: ¿Cuánto nos conoces? 🤔</h2>
+            <p class="text-center text-gray-600 mb-8 max-w-2xl mx-auto">Pon a prueba tus conocimientos sobre nuestra historia.</p>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Nickname Input -->
+                <div class="card p-6 lg:col-span-1">
+                    <h3 class="text-2xl font-semibold text-gray-700 mb-4">Tu Nickname para la Trivia</h3>
+                    <div class="mb-4">
+                        <label for="nicknameInput" class="block text-gray-700 text-sm font-medium mb-2 sr-only">Tu Nickname para la Trivia</label>
+                        <input type="text" id="nicknameInput" placeholder="Ej. El Mejor Amigo" class="input-field">
+                        <button id="saveNicknameBtn" class="btn-secondary mt-2 w-full">Guardar Nickname</button>
+                    </div>
+                    <!-- Tabla de Clasificación -->
+                    <h3 class="text-2xl font-semibold text-gray-700 mb-4 mt-8">Tabla de Clasificación 🏆</h3>
+                    <div id="leaderboardList" class="space-y-3 max-h-96 overflow-y-auto">
+                        <!-- Los puntajes se cargarán aquí dinámicamente -->
+                        <p class="text-center text-gray-500" id="noScoresMessage">No hay puntajes aún. ¡Sé el primero en jugar! 🚀</p>
+                    </div>
+                </div>
+
+                <!-- Pregunta de Trivia -->
+                <div class="card p-6 lg:col-span-2">
+                    <h3 class="text-2xl font-semibold text-gray-700 mb-4">Pregunta <span id="currentQuestionNumber">1</span> de <span id="totalQuestions">X</span></h3>
+                    <div id="triviaQuestionContainer">
+                        <p id="triviaQuestion" class="text-xl font-medium mb-6 text-gray-700">Cargando pregunta...</p>
+                        <div id="triviaOptions" class="space-y-3">
+                            <!-- Las opciones se cargarán aquí dinámicamente -->
+                        </div>
+                        <button id="submitTriviaBtn" class="btn-primary mt-6 w-full flex items-center justify-center">
+                            <span id="submitTriviaText">Enviar Respuesta</span>
+                            <div id="submitTriviaSpinner" class="loading-spinner ml-2 hidden"></div>
+                        </button>
+                        <p id="triviaFeedback" class="mt-4 text-center font-semibold"></p>
+                        <button id="nextQuestionBtn" class="btn-secondary mt-4 w-full hidden">Siguiente Pregunta</button>
+                        <button id="restartTriviaBtn" class="btn-secondary mt-4 w-full hidden">Reiniciar Trivia</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white p-4 text-center text-sm">
+        <p>&copy; 2025 Nuestra Historia, Nuestra Música para Mariana y Rogelio. Hecho con amor. ❤️</p>
+    </footer>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, addDoc, setDoc, updateDoc, onSnapshot, collection, query, where, getDocs, writeBatch, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global variables for Firebase instances
+        let app;
+        let db;
+        let auth;
+        let userId;
+
+        // Message elements (declared globally and assigned in DOMContentLoaded)
+        let noSongsMessage;
+        let noStorySongsMessage;
+        let noScoresMessage;
+
+
+        // Ensure __app_id, __firebase_config, __initial_auth_token are defined in the environment
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // --- Modal Elements and Functions ---
+        const messageModal = document.getElementById('messageModal');
+        const modalMessage = document.getElementById('modalMessage');
+        const closeModalButton = document.querySelector('#messageModal .close-button');
+        const modalAcceptButton = document.getElementById('modalAcceptBtn');
+
+        function showModal(message) {
+            modalMessage.textContent = message;
+            messageModal.classList.add('active'); // Add active class for transition
+            messageModal.style.display = 'flex'; // Make it visible
+        }
+
+        function closeModal() {
+            modalMessage.textContent = ''; // Clear message when closing
+            messageModal.classList.remove('active'); // Remove active class to trigger fade-out
+            // Delay hiding display property until transition completes
+            setTimeout(() => {
+                messageModal.style.display = 'none';
+            }, 300); // Should match CSS transition duration
+        }
+
+        // --- Utility Functions for UI State (Spinners) ---
+        function showSpinner(buttonId, textId, spinnerId) {
+            const button = document.getElementById(buttonId);
+            const textSpan = document.getElementById(textId);
+            const spinnerDiv = document.getElementById(spinnerId);
+
+            if (textSpan) textSpan.classList.add('hidden');
+            if (spinnerDiv) spinnerDiv.classList.remove('hidden');
+            if (button) {
+                button.classList.add('opacity-75', 'cursor-not-allowed');
+                button.disabled = true;
+            }
+        }
+
+        function hideSpinner(buttonId, textId, spinnerId, originalText) {
+            const button = document.getElementById(buttonId);
+            const textSpan = document.getElementById(textId);
+            const spinnerDiv = document.getElementById(spinnerId);
+
+            if (textSpan) {
+                textSpan.classList.remove('hidden');
+                textSpan.textContent = originalText;
+            }
+            if (spinnerDiv) spinnerDiv.classList.add('hidden');
+            if (button) {
+                button.classList.remove('opacity-75', 'cursor-not-allowed');
+                button.disabled = false;
+            }
+        }
+
+        // --- Firebase Initialization and Authentication ---
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                // Assign message elements here after DOM is ready
+                noSongsMessage = document.getElementById('noSongsMessage');
+                noStorySongsMessage = document.getElementById('noStorySongsMessage');
+                noScoresMessage = document.getElementById('noScoresMessage');
+
+                // Attach event listeners for modal buttons once DOM is loaded
+                // Ensure event listeners are attached only once
+                if (closeModalButton && !closeModalButton.dataset.listenerAttached) {
+                    closeModalButton.addEventListener('click', closeModal);
+                    closeModalButton.dataset.listenerAttached = 'true';
+                }
+                if (modalAcceptButton && !modalAcceptButton.dataset.listenerAttached) {
+                    modalAcceptButton.addEventListener('click', closeModal);
+                    modalAcceptButton.dataset.listenerAttached = 'true';
+                }
+
+                // Authenticate user
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        document.getElementById('userIdDisplay').textContent = `Tu ID de Invitado: ${userId}`;
+                        console.log("User authenticated:", userId);
+                        // Once authenticated, start listening for data
+                        setupRealtimeListeners();
+                        loadNickname(); // Load nickname if it exists
+                    } else {
+                        // Attempt anonymous sign-in if no user or token
+                        try {
+                            if (initialAuthToken) {
+                                await signInWithCustomToken(auth, initialAuthToken);
+                            } else {
+                                await signInAnonymously(auth);
+                            }
+                        } catch (error) {
+                            console.error("Error during authentication:", error);
+                            showModal("Hubo un error al autenticar. Por favor, recarga la página.");
+                        }
+                    }
+                });
+
+            } catch (error) {
+                console.error("Error initializing Firebase:", error);
+                showModal("Hubo un error al iniciar la aplicación. Por favor, inténtalo de nuevo más tarde.");
+            }
+        });
+
+        // --- Navigation Logic ---
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const sections = document.querySelectorAll('.section-content');
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const targetSectionId = button.dataset.section + '-section';
+
+                // Remove 'active' from all buttons and sections
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                sections.forEach(sec => sec.classList.remove('active'));
+
+                // Add 'active' to the clicked button and its corresponding section
+                button.classList.add('active');
+                document.getElementById(targetSectionId).classList.add('active');
+            });
+        });
+
+        // --- Music Selection and Voting Section Logic ---
+        const songRequestsList = document.getElementById('songRequestsList');
+        // noSongsMessage is now globally declared and assigned in DOMContentLoaded
+
+        const submitVotesBtn = document.getElementById('submitVotesBtn');
+
+        submitVotesBtn.addEventListener('click', async () => {
+            if (!userId) {
+                showModal("Tu ID de invitado no está listo aún. Por favor, espera un momento o recarga la página.");
+                return;
+            }
+
+            // Get all checked checkboxes that are not disabled
+            const selectedCheckboxes = document.querySelectorAll('#songRequestsList input[type="checkbox"]:checked:not(:disabled)');
+            if (selectedCheckboxes.length === 0) {
+                showModal("Por favor, selecciona al menos una canción para votar.");
+                return;
+            }
+
+            showSpinner('submitVotesBtn', 'submitVotesText', 'submitVotesSpinner');
+
+            try {
+                // Use a batch write for atomic updates of multiple documents
+                const batch = writeBatch(db);
+
+                for (const checkbox of selectedCheckboxes) {
+                    const songId = checkbox.dataset.songId;
+                    const songRef = doc(db, `artifacts/${appId}/public/data/wedding_music_requests`, songId);
+
+                    // Fetch the current document to get the 'voters' array
+                    const songDoc = await getDoc(songRef);
+                    if (songDoc.exists()) {
+                        const data = songDoc.data();
+                        let voters = data.voters || [];
+
+                        // Ensure the user hasn't already voted for this specific song to prevent duplicate votes
+                        if (!voters.includes(userId)) {
+                            voters.push(userId); // Add user ID to the voters array
+                            batch.update(songRef, {
+                                votes: increment(1), // Atomically increment the vote count
+                                voters: voters
+                            });
+                        }
+                    }
+                }
+                await batch.commit(); // Commit all batched updates
+                showModal("¡Votos registrados con éxito! Gracias por participar. 🎉");
+            } catch (e) {
+                console.error("Error submitting votes: ", e);
+                showModal("Error al registrar tus votos. Por favor, inténtalo de nuevo.");
+            } finally {
+                hideSpinner('submitVotesBtn', 'submitVotesText', 'submitVotesSpinner', 'Enviar Votos');
+            }
+        });
+
+
+        function setupRealtimeListeners() {
+            // Ensure message elements are hidden initially, and only revealed by listeners if needed.
+            if (noSongsMessage) noSongsMessage.classList.add('hidden');
+            if (noStorySongsMessage) noStorySongsMessage.classList.add('hidden');
+            if (noScoresMessage) noScoresMessage.classList.add('hidden');
+
+            // Check and add sample story songs if the collection is empty
+            const storySongsRef = collection(db, `artifacts/${appId}/public/data/wedding_story_songs`);
+            getDocs(storySongsRef).then(snapshot => {
+                if (snapshot.empty) {
+                    console.log("Adding sample story songs...");
+                    addDoc(storySongsRef, {
+                        milestone: "Nuestro Primer Café ☕",
+                        title: "Perfect",
+                        artist: "Ed Sheeran",
+                        anecdote: "Rogelio derramó café en la camisa de Mariana, pero fue el inicio de algo perfecto.",
+                        imageUrl: "https://placehold.co/400x250/ef4444/ffffff?text=Primer+Café"
+                    });
+                    addDoc(storySongsRef, {
+                        milestone: "El Viaje Inesperado ✈️",
+                        title: "Home",
+                        artist: "Edward Sharpe & The Magnetic Zeros",
+                        anecdote: "Un viaje espontáneo a la playa donde esta canción se convirtió en el himno de nuestra aventura.",
+                        imageUrl: "https://placehold.co/400x250/34d399/ffffff?text=Viaje+Inesperado"
+                    });
+                    addDoc(storySongsRef, {
+                        milestone: "La Propuesta Mágica ✨",
+                        title: "A Sky Full of Stars",
+                        artist: "Coldplay",
+                        anecdote: "Bajo un cielo estrellado, Rogelio le pidió matrimonio a Mariana, ¡y ella dijo SÍ!",
+                        imageUrl: "https://placehold.co/400x250/60a5fa/ffffff?text=La+Propuesta"
+                    });
+                    addDoc(storySongsRef, {
+                        milestone: "Nuestro Primer Apartamento 🏠",
+                        title: "The House of the Rising Sun",
+                        artist: "The Animals",
+                        anecdote: "Esta sonaba en bucle mientras pintábamos las paredes, ¡nuestro primer hogar juntos!",
+                        imageUrl: "https://placehold.co/400x250/f9a8d4/ffffff?text=Primer+Hogar"
+                    });
+                    addDoc(storySongsRef, {
+                        milestone: "Nuestra Noche de Película Favorita 🍿",
+                        title: "My Heart Will Go On",
+                        artist: "Celine Dion",
+                        anecdote: "Un clásico para nuestras noches de cine acurrucados, ¡incluso si Rogelio se duerme!",
+                        imageUrl: "https://placehold.co/400x250/fde047/ffffff?text=Noche+de+Película"
+                    });
+                    addDoc(storySongsRef, {
+                        milestone: "Conociendo a la Familia 👨‍👩‍👧‍👦",
+                        title: "You've Got a Friend in Me",
+                        artist: "Randy Newman",
+                        anecdote: "La primera vez que conocimos a nuestras familias extendidas. ¡Amor a primera vista!",
+                        imageUrl: "https://placehold.co/400x250/84cc16/ffffff?text=Familia"
+                    });
+                    addDoc(storySongsRef, {
+                        milestone: "Nuestro Primer Desafío 💪",
+                        title: "Stronger",
+                        artist: "Kelly Clarkson",
+                        anecdote: "Superamos juntos un obstáculo y nos hicimos más fuertes. ¡Esta canción lo resume!",
+                        imageUrl: "https://placehold.co/400x250/a855f7/ffffff?text=Primer+Desafío"
+                    });
+                    addDoc(storySongsRef, {
+                        milestone: "La Escapada Secreta 🏞️",
+                        title: "Take Me Home, Country Roads",
+                        artist: "John Denver",
+                        anecdote: "Nuestro primer viaje por carretera, sin rumbo fijo, solo nosotros y el paisaje.",
+                        imageUrl: "https://placehold.co/400x250/ec4899/ffffff?text=Escapada+Secreta"
+                    });
+                    addDoc(storySongsRef, {
+                        milestone: "Cuando Nos Dimos Cuenta ❤️",
+                        title: "Can't Help Falling in Love",
+                        artist: "Elvis Presley",
+                        anecdote: "Esa noche, bailando en la sala, supimos que esto era para siempre.",
+                        imageUrl: "https://placehold.co/400x250/fca5a5/ffffff?text=Amor+Eterno"
+                    });
+                    addDoc(storySongsRef, {
+                        milestone: "Preparando el Gran Día 👰🤵",
+                        title: "Celebration",
+                        artist: "Kool & The Gang",
+                        anecdote: "Cada paso de la planificación de la boda nos llena de alegría y emoción.",
+                        imageUrl: "https://placehold.co/400x250/3b82f6/ffffff?text=Gran+Día"
+                    });
+                }
+            }).catch(error => console.error("Error checking/adding story songs:", error));
+
+
+            // Check and add sample trivia questions if the collection is empty
+            const triviaQuestionsRef = collection(db, `artifacts/${appId}/public/data/wedding_trivia_questions`);
+            getDocs(triviaQuestionsRef).then(snapshot => {
+                if (snapshot.empty) {
+                    console.log("Adding sample trivia questions...");
+                    addDoc(triviaQuestionsRef, {
+                        question: "¿Cuál es el postre favorito de Rogelio que Mariana prepara?",
+                        options: ["Tarta de manzana", "Brownies de chocolate", "Cheesecake de fresa", "Flan"],
+                        correctAnswerIndex: 1
+                    });
+                    addDoc(triviaQuestionsRef, {
+                        question: "¿Dónde tuvieron Mariana y Rogelio su primera 'mini-cita' no oficial?",
+                        options: ["En un concierto", "Una librería", "El gimnasio", "Un partido de fútbol"],
+                        correctAnswerIndex: 2
+                    });
+                    addDoc(triviaQuestionsRef, {
+                        question: "¿Qué animal es el favorito de Mariana?",
+                        options: ["Perro", "Gato", "Búho", "Delfín"],
+                        correctAnswerIndex: 3
+                    });
+                    addDoc(triviaQuestionsRef, {
+                        question: "¿Cuál fue el primer regalo que Rogelio le dio a Mariana?",
+                        options: ["Un ramo de flores", "Un libro de su autor favorito", "Un collar con iniciales", "Una entrada para un festival"],
+                        correctAnswerIndex: 1
+                    });
+                    addDoc(triviaQuestionsRef, {
+                        question: "¿Qué hobby comparten Mariana y Rogelio?",
+                        options: ["Senderismo", "Cocinar nuevas recetas", "Jugar videojuegos", "Ver series de misterio"],
+                        correctAnswerIndex: 3
+                    });
+                    addDoc(triviaQuestionsRef, {
+                        question: "¿Cuál es la frase favorita de Rogelio para animar a Mariana?",
+                        options: ["'¡Tú puedes con todo!'", "'¡Vamos a por ello!'", "'¡Eres la mejor!'", "'¡Aquí estoy para ti!'"],
+                        correctAnswerIndex: 0
+                    });
+                    addDoc(triviaQuestionsRef, {
+                        question: "¿Qué tipo de música prefiere Mariana para relajarse?",
+                        options: ["Pop bailable", "Rock clásico", "Música instrumental suave", "Jazz vocal"],
+                        correctAnswerIndex: 2
+                    });
+                    addDoc(triviaQuestionsRef, {
+                        question: "¿Cuál es el lugar soñado de vacaciones de Mariana y Rogelio?",
+                        options: ["París, Francia", "Maldivas", "Kioto, Japón", "Roma, Italia"],
+                        correctAnswerIndex: 1
+                    });
+                    addDoc(triviaQuestionsRef, {
+                        question: "¿Qué suelen pedir cuando van a su restaurante favorito?",
+                        options: ["Sushi variado", "Hamburguesas gourmet", "Pasta carbonara", "Tacos al pastor"],
+                        correctAnswerIndex: 3
+                    });
+                    addDoc(triviaQuestionsRef, {
+                        question: "¿Cuántos años llevaban saliendo Mariana y Rogelio antes de comprometerse?",
+                        options: ["1 año", "2 años", "3 años", "4 años"],
+                        correctAnswerIndex: 2
+                    });
+                }
+            }).catch(error => console.error("Error checking/adding trivia questions:", error));
+
+            // Check and add sample music requests if the collection is empty (for voting)
+            const musicRequestsRef = collection(db, `artifacts/${appId}/public/data/wedding_music_requests`);
+            getDocs(musicRequestsRef).then(snapshot => {
+                if (snapshot.empty) {
+                    console.log("Adding sample music requests...");
+                    addDoc(musicRequestsRef, {
+                        title: "Can't Help Falling in Love",
+                        artist: "Elvis Presley",
+                        genre: "Baladas Románticas",
+                        dedication: "Para Mariana y Rogelio, que su amor sea tan eterno como esta canción.",
+                        votes: 5,
+                        voters: []
+                    });
+                    addDoc(musicRequestsRef, {
+                        title: "Fly Me to the Moon",
+                        artist: "Frank Sinatra",
+                        genre: "Jazz Suave",
+                        dedication: "Para bailar bajo las estrellas, ¡como la primera vez que se vieron!",
+                        votes: 3,
+                        voters: []
+                    });
+                    addDoc(musicRequestsRef, {
+                        title: "Thinking Out Loud",
+                        artist: "Ed Sheeran",
+                        genre: "Éxitos Modernos",
+                        dedication: "Cada palabra de esta canción es un reflejo del amor de Mariana y Rogelio.",
+                        votes: 7,
+                        voters: []
+                    });
+                    addDoc(musicRequestsRef, {
+                        title: "Pachelbel's Canon in D",
+                        artist: "Johann Pachelbel",
+                        genre: "Adaptaciones Clásicas",
+                        dedication: "La melodía perfecta para una noche inolvidable en la boda de Mariana y Rogelio.",
+                        votes: 4,
+                        voters: []
+                    });
+                    addDoc(musicRequestsRef, {
+                        title: "Marry You",
+                        artist: "Bruno Mars",
+                        genre: "Éxitos Modernos",
+                        dedication: "¡Porque esta noche es para celebrar el amor! 🎉",
+                        votes: 6,
+                        voters: []
+                    });
+                    addDoc(musicRequestsRef, {
+                        title: "L-O-V-E",
+                        artist: "Nat King Cole",
+                        genre: "Jazz Suave",
+                        dedication: "Simple y perfecta, como nuestro amor.",
+                        votes: 4,
+                        voters: []
+                    });
+                    addDoc(musicRequestsRef, {
+                        title: "What a Wonderful World",
+                        artist: "Louis Armstrong",
+                        genre: "Jazz Suave",
+                        dedication: "Recordando que el mundo es hermoso a vuestro lado.",
+                        votes: 2,
+                        voters: []
+                    });
+                    addDoc(musicRequestsRef, {
+                        title: "Perfect Symphony",
+                        artist: "Ed Sheeran & Andrea Bocelli",
+                        genre: "Baladas Románticas",
+                        dedication: "La unión de dos mundos en perfecta armonía.",
+                        votes: 8,
+                        voters: []
+                    });
+                    addDoc(musicRequestsRef, {
+                        title: "La Vie en Rose",
+                        artist: "Édith Piaf",
+                        genre: "Adaptaciones Clásicas",
+                        dedication: "Cuando la vida es color de rosa con la persona amada.",
+                        votes: 3,
+                        voters: []
+                    });
+                    addDoc(musicRequestsRef, {
+                        title: "Stand By Me",
+                        artist: "Ben E. King",
+                        genre: "Éxitos Modernos",
+                        dedication: "Siempre juntos, pase lo que pase.",
+                        votes: 5,
+                        voters: []
+                    });
+                }
+            }).catch(error => console.error("Error checking/adding music requests:", error));
+
+            // Listen for song requests (predefined songs for voting)
+            const qSongs = query(collection(db, `artifacts/${appId}/public/data/wedding_music_requests`));
+            onSnapshot(qSongs, (snapshot) => {
+                const songs = [];
+                snapshot.forEach((doc) => {
+                    songs.push({ id: doc.id, ...doc.data() });
+                });
+
+                // Sort songs by votes in descending order
+                songs.sort((a, b) => b.votes - a.votes);
+
+                songRequestsList.innerHTML = ''; // Clear existing list
+                if (songs.length === 0) {
+                    if (noSongsMessage) noSongsMessage.classList.remove('hidden'); // Show message
+                    submitVotesBtn.classList.add('hidden'); // Hide submit button if no songs
+                } else {
+                    if (noSongsMessage) noSongsMessage.classList.add('hidden'); // Hide the no songs message
+                    submitVotesBtn.classList.remove('hidden'); // Show submit button
+                    songs.forEach(song => {
+                        // Check if current user has already voted for this specific song
+                        const hasUserVotedForThisSong = userId && song.voters && song.voters.includes(userId);
+
+                        const songElement = document.createElement('div');
+                        songElement.className = 'song-item flex items-center bg-gray-50 p-3 rounded-xl shadow-sm hover:shadow-md transition-all relative group';
+                        songElement.innerHTML = `
+                            <div class="flex-grow">
+                                <p class="font-semibold text-lg text-gray-800">${song.title} ${song.artist ? `<span class="text-sm text-gray-500"> - ${song.artist}</span>` : ''}</p>
+                                <p class="text-sm text-gray-600">Género: ${song.genre}</p>
+                                <!-- Show dedication on hover if available -->
+                                ${song.dedication ? `<div class="dedication-box absolute left-0 right-0 top-full mt-2 z-10 p-2 text-sm">${song.dedication}</div>` : ''}
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <span class="text-xl font-bold text-red-600 vote-count-animated">${song.votes}</span>
+                                <input type="checkbox" id="checkbox-${song.id}" data-song-id="${song.id}" class="form-checkbox h-6 w-6 text-red-600 rounded-md cursor-pointer" ${hasUserVotedForThisSong ? 'disabled' : ''}>
+                                <label for="checkbox-${song.id}" class="ml-2 cursor-pointer text-gray-700 sr-only">${hasUserVotedForThisSong ? 'Votado' : 'Votar'}</label>
+                            </div>
+                        `;
+                        songRequestsList.appendChild(songElement);
+                    });
+                }
+            });
+
+            // Listen for story songs
+            const qStory = query(collection(db, `artifacts/${appId}/public/data/wedding_story_songs`));
+            onSnapshot(qStory, (snapshot) => {
+                const storySongs = [];
+                snapshot.forEach((doc) => {
+                    storySongs.push({ id: doc.id, ...doc.data() });
+                });
+
+                const storySongsList = document.getElementById('storySongsList');
+                // noStorySongsMessage is now globally declared and assigned in DOMContentLoaded
+                storySongsList.innerHTML = '';
+                if (storySongs.length === 0) {
+                    if (noStorySongsMessage) noStorySongsMessage.classList.remove('hidden'); // Show message
+                    storySongsList.appendChild(noStorySongsMessage); // Re-add it if it was removed
+                } else {
+                    if (noStorySongsMessage) noStorySongsMessage.classList.add('hidden'); // Hide message
+                    storySongs.forEach(item => {
+                        const storyItem = document.createElement('div');
+                        storyItem.className = 'card p-6 flex flex-col items-center text-center';
+                        storyItem.innerHTML = `
+                            <img src="${item.imageUrl || 'https://placehold.co/300x200/ef4444/ffffff?text=Tu+Imagen'}" alt="${item.title}" class="w-full h-48 object-cover rounded-lg mb-4 shadow-md">
+                            <h4 class="text-xl font-semibold text-red-600 mb-2">${item.milestone}</h4>
+                            <p class="text-lg font-medium text-gray-800 mb-2">"${item.title}" - ${item.artist}</p>
+                            <p class="text-gray-600 text-sm italic">"${item.anecdote}"</p>
+                        `;
+                        storySongsList.appendChild(storyItem);
+                    });
+                }
+            });
+
+            // Listen for trivia questions
+            const qTriviaQuestions = query(collection(db, `artifacts/${appId}/public/data/wedding_trivia_questions`));
+            onSnapshot(qTriviaQuestions, (snapshot) => {
+                triviaQuestions = [];
+                snapshot.forEach((doc) => {
+                    triviaQuestions.push({ id: doc.id, ...doc.data() });
+                });
+                document.getElementById('totalQuestions').textContent = triviaQuestions.length;
+                if (triviaQuestions.length > 0 && currentQuestionIndex === -1) {
+                    startTrivia();
+                } else if (triviaQuestions.length > 0 && currentQuestionIndex !== -1) {
+                    // If trivia is already ongoing, ensure the current question is re-rendered in case data changed
+                    displayQuestion(currentQuestionIndex);
+                } else {
+                    document.getElementById('triviaQuestion').textContent = "No hay preguntas de trivia disponibles aún.";
+                    document.getElementById('triviaOptions').innerHTML = '';
+                    document.getElementById('submitTriviaBtn').classList.add('hidden');
+                }
+            });
+
+            // Listen for trivia scores
+            const qScores = query(collection(db, `artifacts/${appId}/public/data/wedding_trivia_scores`));
+            onSnapshot(qScores, (snapshot) => {
+                const scores = [];
+                snapshot.forEach((doc) => {
+                    scores.push({ id: doc.id, ...doc.data() });
+                });
+
+                scores.sort((a, b) => b.score - a.score); // Sort by score descending
+
+                const leaderboardList = document.getElementById('leaderboardList');
+                // noScoresMessage is now globally declared and assigned in DOMContentLoaded
+                leaderboardList.innerHTML = ''; // Clear existing list
+                if (scores.length === 0) {
+                    if (noScoresMessage) noScoresMessage.classList.remove('hidden'); // Show message
+                } else {
+                    if (noScoresMessage) noScoresMessage.classList.add('hidden'); // Hide message
+                    scores.forEach((score, index) => {
+                        const scoreItem = document.createElement('div');
+                        scoreItem.className = `flex justify-between items-center p-3 rounded-lg ${index === 0 ? 'bg-yellow-100 font-bold' : 'bg-gray-50'}`;
+                        scoreItem.innerHTML = `
+                            <span class="text-gray-800">${index + 1}. ${score.nickname || 'Anónimo'}</span>
+                            <span class="text-red-500">${score.score} puntos</span>
+                        `;
+                        leaderboardList.appendChild(scoreItem);
+                    });
+                }
+            });
+        }
+
+        // --- Trivia de Amor Section Logic ---
+        let triviaQuestions = [];
+        let currentQuestionIndex = -1;
+        let userScore = 0;
+        let userNickname = 'Anónimo';
+
+        const triviaQuestionEl = document.getElementById('triviaQuestion');
+        const triviaOptionsEl = document.getElementById('triviaOptions');
+        const submitTriviaBtn = document.getElementById('submitTriviaBtn');
+        const triviaFeedbackEl = document.getElementById('triviaFeedback');
+        const nextQuestionBtn = document.getElementById('nextQuestionBtn');
+        const restartTriviaBtn = document.getElementById('restartTriviaBtn');
+        const nicknameInput = document.getElementById('nicknameInput');
+        const saveNicknameBtn = document.getElementById('saveNicknameBtn');
+        // noStorySongsMessage and noScoresMessage are now globally declared and assigned in DOMContentLoaded
+
+        function startTrivia() {
+            currentQuestionIndex = 0;
+            userScore = 0;
+            if (triviaQuestions.length > 0) {
+                displayQuestion(currentQuestionIndex);
+                submitTriviaBtn.classList.remove('hidden');
+                nextQuestionBtn.classList.add('hidden');
+                restartTriviaBtn.classList.add('hidden');
+                triviaFeedbackEl.textContent = '';
+            }
+        }
+
+        function displayQuestion(index) {
+            if (index >= triviaQuestions.length) {
+                endTrivia();
+                return;
+            }
+
+            const question = triviaQuestions[index];
+            document.getElementById('currentQuestionNumber').textContent = index + 1;
+            triviaQuestionEl.textContent = question.question;
+            triviaOptionsEl.innerHTML = ''; // Clear previous options
+
+            question.options.forEach((option, i) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'flex items-center';
+                optionDiv.innerHTML = `
+                    <input type="radio" id="option${i}" name="triviaOption" value="${i}" class="form-radio h-5 w-5 text-red-600">
+                    <label for="option${i}" class="ml-3 text-lg text-gray-700">${option}</label>
+                `;
+                triviaOptionsEl.appendChild(optionDiv);
+            });
+
+            submitTriviaBtn.classList.remove('hidden');
+            nextQuestionBtn.classList.add('hidden');
+            triviaFeedbackEl.textContent = '';
+        }
+
+        submitTriviaBtn.addEventListener('click', async () => {
+            const selectedOption = document.querySelector('input[name="triviaOption"]:checked');
+            if (!selectedOption) {
+                showModal("Por favor, selecciona una respuesta antes de enviar.");
+                return;
+            }
+
+            showSpinner('submitTriviaBtn', 'submitTriviaText', 'submitTriviaSpinner');
+
+            const userAnswerIndex = parseInt(selectedOption.value);
+            const currentQuestion = triviaQuestions[currentQuestionIndex];
+
+            if (userAnswerIndex === currentQuestion.correctAnswerIndex) {
+                userScore += 1;
+                triviaFeedbackEl.textContent = "¡Correcto! ✅";
+                triviaFeedbackEl.className = 'mt-4 text-center font-semibold text-green-600';
+            } else {
+                triviaFeedbackEl.textContent = `Incorrecto. La respuesta correcta era: ${currentQuestion.options[currentQuestion.correctAnswerIndex]}. ❌`;
+                triviaFeedbackEl.className = 'mt-4 text-center font-semibold text-red-600';
+            }
+
+            hideSpinner('submitTriviaBtn', 'submitTriviaText', 'submitTriviaSpinner', 'Enviar Respuesta');
+            submitTriviaBtn.classList.add('hidden'); // Always hide after submission
+
+            if (currentQuestionIndex < triviaQuestions.length - 1) {
+                nextQuestionBtn.classList.remove('hidden');
+            } else {
+                endTrivia();
+            }
+        });
+
+        nextQuestionBtn.addEventListener('click', () => {
+            currentQuestionIndex++;
+            displayQuestion(currentQuestionIndex);
+        });
+
+        restartTriviaBtn.addEventListener('click', () => {
+            startTrivia();
+        });
+
+        async function endTrivia() {
+            triviaQuestionEl.textContent = `¡Trivia Terminada! Tu puntaje final es: ${userScore} de ${triviaQuestions.length}.`;
+            triviaOptionsEl.innerHTML = '';
+            triviaFeedbackEl.textContent = '';
+            submitTriviaBtn.classList.add('hidden');
+            nextQuestionBtn.classList.add('hidden');
+            restartTriviaBtn.classList.remove('hidden');
+
+            await saveScore(); // Save final score to leaderboard
+            showModal(`¡Felicidades! Terminaste la trivia. Tu puntaje es ${userScore}. Consulta la tabla de clasificación. 🎉`);
+        }
+
+        async function saveScore() {
+            if (!userId) {
+                console.warn("User ID not available to save score.");
+                return;
+            }
+            const scoresRef = doc(db, `artifacts/${appId}/public/data/wedding_trivia_scores`, userId);
+            try {
+                await setDoc(scoresRef, {
+                    nickname: userNickname,
+                    score: userScore,
+                    lastUpdated: new Date()
+                }, { merge: true }); // Use merge to update existing or create new
+                console.log("Score saved/updated successfully!");
+            } catch (e) {
+                console.error("Error saving score: ", e);
+                showModal("Error al guardar tu puntaje.");
+            }
+        }
+
+        function loadNickname() {
+            const storedNickname = localStorage.getItem(`nickname_${userId}`);
+            if (storedNickname) {
+                userNickname = storedNickname;
+                nicknameInput.value = storedNickname;
+            } else {
+                nicknameInput.value = ''; // Clear if no nickname found
+                userNickname = 'Anónimo'; // Default
+            }
+        }
+
+        saveNicknameBtn.addEventListener('click', () => {
+            const newNickname = nicknameInput.value.trim();
+            if (newNickname) {
+                userNickname = newNickname;
+                localStorage.setItem(`nickname_${userId}`, newNickname);
+                showModal("Nickname guardado. ¡Listo para la trivia! ✅");
+            } else {
+                showModal("Por favor, introduce un nickname válido.");
+            }
+        });
+
+    </script>
+</body>
+</html>
