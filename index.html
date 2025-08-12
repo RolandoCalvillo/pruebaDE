@@ -187,18 +187,9 @@
         </div>
     </div>
 
-    <!-- Scripts de Firebase SDKs -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, addDoc, onSnapshot, collection, query, updateDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Variables globales del entorno Canvas (se llenarán automáticamente)
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
-        // Referencias a los elementos del DOM
+    <!-- Script principal de la aplicación -->
+    <script>
+        // --- Referencias a elementos del DOM ---
         const tabButtons = document.querySelectorAll('.tab-button');
         const tabContents = document.querySelectorAll('.tab-content');
         const musicListContainer = document.getElementById('music-list-container');
@@ -226,37 +217,18 @@
         const modalCloseBtn = document.getElementById('modal-close-btn');
         const modalOkBtn = document.getElementById('modal-ok-btn');
 
-        // Variables de estado de la aplicación
-        let app;
-        let db;
-        let auth;
-        let userId = 'anon';
-        let votedSongs = new Set();
-        let triviaQuestions = [];
-        let currentTriviaQuestionIndex = 0;
-        let triviaScore = 0;
-        let nickname = '';
-
-        // Definición de las colecciones públicas en Firestore
-        const PUBLIC_COLLECTIONS = {
-            MUSIC_REQUESTS: `artifacts/${appId}/public/data/wedding_music_requests`,
-            STORY_SONGS: `artifacts/${appId}/public/data/wedding_story_songs`,
-            TRIVIA_QUESTIONS: `artifacts/${appId}/public/data/wedding_trivia_questions`,
-            TRIVIA_SCORES: `artifacts/${appId}/public/data/wedding_trivia_scores`
-        };
-
-        // Datos de ejemplo para poblar Firestore
-        const musicData = [
-            { title: "Perfect", artist: "Ed Sheeran", genre: "Balada Romántica", dedication: "Para el amor que encontré en ti.", votes: 0 },
-            { title: "La Vie en Rose", artist: "Louis Armstrong", genre: "Jazz Suave", dedication: "Nuestro primer baile, un recuerdo para siempre.", votes: 0 },
-            { title: "A Sky Full of Stars", artist: "Coldplay", genre: "Éxito Moderno", dedication: "Por todos los momentos inolvidables juntos.", votes: 0 },
-            { title: "Canon en Re Mayor", artist: "Pachelbel", genre: "Clásico", dedication: "La melodía de nuestra felicidad.", votes: 0 },
-            { title: "Fly Me to the Moon", artist: "Frank Sinatra", genre: "Jazz Suave", dedication: "Nuestro viaje juntos, hacia las estrellas.", votes: 0 },
-            { title: "Thinking Out Loud", artist: "Ed Sheeran", genre: "Balada Romántica", dedication: "Cada día te amo más que el anterior.", votes: 0 },
-            { title: "Happy", artist: "Pharrell Williams", genre: "Éxito Moderno", dedication: "Celebrando la alegría de estar juntos.", votes: 0 },
-            { title: "Claro de Luna", artist: "Debussy", genre: "Clásico", dedication: "Nuestras noches tranquilas y románticas.", votes: 0 },
-            { title: "L-O-V-E", artist: "Nat King Cole", genre: "Jazz Suave", dedication: "Definición de nuestro amor.", votes: 0 },
-            { title: "Shape of You", artist: "Ed Sheeran", genre: "Éxito Moderno", dedication: "El ritmo de nuestro corazón.", votes: 0 }
+        // --- Datos de la aplicación (ahora locales) ---
+        let musicData = [
+            { id: "1", title: "Perfect", artist: "Ed Sheeran", genre: "Balada Romántica", dedication: "Para el amor que encontré en ti.", votes: 0 },
+            { id: "2", title: "La Vie en Rose", artist: "Louis Armstrong", genre: "Jazz Suave", dedication: "Nuestro primer baile, un recuerdo para siempre.", votes: 0 },
+            { id: "3", title: "A Sky Full of Stars", artist: "Coldplay", genre: "Éxito Moderno", dedication: "Por todos los momentos inolvidables juntos.", votes: 0 },
+            { id: "4", title: "Canon en Re Mayor", artist: "Pachelbel", genre: "Clásico", dedication: "La melodía de nuestra felicidad.", votes: 0 },
+            { id: "5", title: "Fly Me to the Moon", artist: "Frank Sinatra", genre: "Jazz Suave", dedication: "Nuestro viaje juntos, hacia las estrellas.", votes: 0 },
+            { id: "6", title: "Thinking Out Loud", artist: "Ed Sheeran", genre: "Balada Romántica", dedication: "Cada día te amo más que el anterior.", votes: 0 },
+            { id: "7", title: "Happy", artist: "Pharrell Williams", genre: "Éxito Moderno", dedication: "Celebrando la alegría de estar juntos.", votes: 0 },
+            { id: "8", title: "Claro de Luna", artist: "Debussy", genre: "Clásico", dedication: "Nuestras noches tranquilas y románticas.", votes: 0 },
+            { id: "9", title: "L-O-V-E", artist: "Nat King Cole", genre: "Jazz Suave", dedication: "Definición de nuestro amor.", votes: 0 },
+            { id: "10", title: "Shape of You", artist: "Ed Sheeran", genre: "Éxito Moderno", dedication: "El ritmo de nuestro corazón.", votes: 0 }
         ];
 
         const storyData = [
@@ -284,6 +256,12 @@
             { question: "¿Cuál es el hobby secreto de Mariana?", options: ["Bailar salsa", "Hacer pasteles", "Coleccionar vinilos", "Pintar al óleo"], answer: "Pintar al óleo" },
             { question: "¿En qué mes se conocieron por primera vez?", options: ["Enero", "Marzo", "Junio", "Septiembre"], answer: "Septiembre" }
         ];
+
+        let votedSongs = new Set();
+        let currentTriviaQuestionIndex = 0;
+        let triviaScore = 0;
+        let nickname = '';
+        let leaderboardScores = []; // Almacenamiento local para los puntajes
 
         // --- Funciones de Utilidad ---
 
@@ -330,116 +308,16 @@
         modalOkBtn.addEventListener('click', hideModal);
         modalCloseBtn.addEventListener('click', hideModal);
 
-        // --- Funciones de Inicialización ---
-
-        /**
-         * Inicializa Firebase, maneja la autenticación y pobla las colecciones si están vacías.
-         */
-        async function initializeFirebase() {
-            try {
-                app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-
-                // Maneja la autenticación anónima o con token personalizado
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    await signInAnonymously(auth);
-                }
-
-                // Espera hasta que el estado de autenticación esté listo para obtener el ID de usuario
-                onAuthStateChanged(auth, async (user) => {
-                    if (user) {
-                        userId = user.uid;
-                        console.log("Usuario autenticado con ID:", userId);
-                        // Poblar colecciones si están vacías
-                        await seedFirestoreData();
-                        // Iniciar listeners de tiempo real
-                        setupRealtimeListeners();
-                        // Cargar preguntas de la trivia
-                        await fetchTriviaQuestions();
-                    } else {
-                        console.log("No se pudo autenticar al usuario.");
-                    }
-                });
-
-            } catch (error) {
-                console.error("Error al inicializar Firebase o al autenticar:", error);
-                showModal("Error", "No se pudo conectar a la base de datos. Por favor, inténtalo de nuevo más tarde.");
-            }
-        }
-
-        /**
-         * Comprueba si las colecciones existen y las crea con datos de ejemplo si no.
-         */
-        async function seedFirestoreData() {
-            try {
-                // Función auxiliar para poblar una colección
-                const populateCollection = async (collectionRef, data) => {
-                    const snapshot = await getDocs(collectionRef);
-                    if (snapshot.empty) {
-                        await Promise.all(data.map(item => addDoc(collectionRef, item)));
-                        console.log(`Colección '${collectionRef.id}' poblada con éxito.`);
-                    }
-                };
-                
-                await populateCollection(collection(db, PUBLIC_COLLECTIONS.MUSIC_REQUESTS), musicData);
-                await populateCollection(collection(db, PUBLIC_COLLECTIONS.STORY_SONGS), storyData);
-                await populateCollection(collection(db, PUBLIC_COLLECTIONS.TRIVIA_QUESTIONS), triviaData);
-
-            } catch (error) {
-                console.error("Error al poblar la base de datos:", error);
-            }
-        }
-
-        /**
-         * Configura los listeners de Firestore en tiempo real para todas las secciones.
-         */
-        function setupRealtimeListeners() {
-            // Listener para la música
-            onSnapshot(query(collection(db, PUBLIC_COLLECTIONS.MUSIC_REQUESTS)), (snapshot) => {
-                const songs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                renderMusicList(songs);
-            });
-
-            // Listener para la historia
-            onSnapshot(query(collection(db, PUBLIC_COLLECTIONS.STORY_SONGS)), (snapshot) => {
-                const milestones = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                renderStoryMilestones(milestones);
-            });
-
-            // Listener para la tabla de clasificación
-            onSnapshot(query(collection(db, PUBLIC_COLLECTIONS.TRIVIA_SCORES)), (snapshot) => {
-                const scores = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                renderLeaderboard(scores);
-            });
-        }
-        
-        /**
-         * Fetches all trivia questions and stores them in an array.
-         */
-        async function fetchTriviaQuestions() {
-            try {
-                const querySnapshot = await getDocs(collection(db, PUBLIC_COLLECTIONS.TRIVIA_QUESTIONS));
-                triviaQuestions = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            } catch (error) {
-                console.error("Error fetching trivia questions:", error);
-                showModal("Error", "No se pudieron cargar las preguntas de la trivia.");
-            }
-        }
-
         // --- Lógica de la Sección 1: Música para Ensamble ---
 
         /**
          * Renderiza la lista de canciones en el DOM.
-         * @param {Array} songs - Lista de canciones de Firestore.
          */
-        function renderMusicList(songs) {
+        function renderMusicList() {
             // Ordenar por votos de mayor a menor
-            songs.sort((a, b) => b.votes - a.votes);
+            const sortedSongs = [...musicData].sort((a, b) => b.votes - a.votes);
             musicListContainer.innerHTML = '';
-            songs.forEach(song => {
+            sortedSongs.forEach(song => {
                 const isVoted = votedSongs.has(song.id);
                 const songCard = document.createElement('div');
                 songCard.className = `flex items-center bg-gray-50 p-4 rounded-lg shadow-sm transition-transform duration-200 ease-in-out hover:scale-105 ${isVoted ? 'opacity-70' : ''}`;
@@ -460,9 +338,9 @@
         }
 
         /**
-         * Maneja el envío de votos a Firestore.
+         * Maneja el envío de votos a la lista local.
          */
-        submitVotesBtn.addEventListener('click', async () => {
+        submitVotesBtn.addEventListener('click', () => {
             const selectedSongs = document.querySelectorAll('input[data-song-id]:checked');
             if (selectedSongs.length === 0) {
                 showModal("Advertencia", "Por favor, selecciona al menos una canción para votar.");
@@ -472,21 +350,19 @@
             toggleSpinner(submitVotesBtn, submitVotesText, submitVotesSpinner, true);
 
             try {
-                const updates = [];
                 for (const checkbox of selectedSongs) {
                     const songId = checkbox.dataset.songId;
-                    const voteCounter = checkbox.closest('.flex').querySelector('.votes-counter');
-                    if (voteCounter) {
-                        const currentVotes = parseInt(voteCounter.textContent);
-                        updates.push(updateDoc(doc(db, PUBLIC_COLLECTIONS.MUSIC_REQUESTS, songId), {
-                            votes: currentVotes + 1
-                        }));
-                        votedSongs.add(songId); // Marca la canción como votada
+                    const songToUpdate = musicData.find(s => s.id === songId);
+                    if (songToUpdate) {
+                        songToUpdate.votes++;
+                        votedSongs.add(songId);
                     }
                 }
-                await Promise.all(updates);
+                
+                // Re-renderizar la lista para mostrar los votos actualizados
+                renderMusicList();
 
-                showModal("Éxito", "¡Gracias por tus votos! La lista se actualizará en tiempo real.");
+                showModal("Éxito", "¡Gracias por tus votos!");
             } catch (error) {
                 console.error("Error al enviar votos:", error);
                 showModal("Error", "Hubo un problema al procesar tus votos. Por favor, inténtalo de nuevo.");
@@ -499,11 +375,10 @@
         
         /**
          * Renderiza los hitos de la historia en el DOM.
-         * @param {Array} milestones - Lista de hitos de Firestore.
          */
-        function renderStoryMilestones(milestones) {
+        function renderStoryMilestones() {
             storyMilestonesContainer.innerHTML = '';
-            milestones.forEach(milestone => {
+            storyData.forEach(milestone => {
                 const milestoneCard = document.createElement('div');
                 milestoneCard.className = `flex flex-col md:flex-row bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 ease-in-out hover:shadow-2xl`;
                 milestoneCard.innerHTML = `
@@ -524,13 +399,12 @@
 
         /**
          * Renderiza la tabla de clasificación.
-         * @param {Array} scores - Lista de puntajes de Firestore.
          */
-        function renderLeaderboard(scores) {
+        function renderLeaderboard() {
             // Ordenar por puntaje de mayor a menor
-            scores.sort((a, b) => b.score - a.score);
+            leaderboardScores.sort((a, b) => b.score - a.score);
             leaderboardList.innerHTML = '';
-            scores.forEach((score, index) => {
+            leaderboardScores.forEach((score, index) => {
                 const scoreItem = document.createElement('div');
                 scoreItem.className = 'flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0';
                 scoreItem.innerHTML = `
@@ -544,7 +418,7 @@
         /**
          * Inicia el juego de trivia.
          */
-        async function startTrivia() {
+        function startTrivia() {
             nickname = document.getElementById('nickname').value.trim();
             if (nickname === '') {
                 showModal("Advertencia", "Por favor, introduce un nickname para comenzar la trivia.");
@@ -563,11 +437,7 @@
          * Renderiza la pregunta actual de la trivia.
          */
         function renderTriviaQuestion() {
-            if (triviaQuestions.length === 0) {
-                showModal("Error", "No se pudieron cargar las preguntas de la trivia.");
-                return;
-            }
-            const questionData = triviaQuestions[currentTriviaQuestionIndex];
+            const questionData = triviaData[currentTriviaQuestionIndex];
 
             triviaQuestion.textContent = questionData.question;
             triviaOptions.innerHTML = '';
@@ -631,9 +501,9 @@
         /**
          * Pasa a la siguiente pregunta o finaliza la trivia.
          */
-        async function nextQuestion() {
+        function nextQuestion() {
             currentTriviaQuestionIndex++;
-            if (currentTriviaQuestionIndex < triviaQuestions.length) {
+            if (currentTriviaQuestionIndex < triviaData.length) {
                 renderTriviaQuestion();
             } else {
                 endTrivia();
@@ -641,23 +511,16 @@
         }
         
         /**
-         * Finaliza la trivia, muestra los resultados y guarda el puntaje.
+         * Finaliza la trivia, muestra los resultados y guarda el puntaje localmente.
          */
-        async function endTrivia() {
+        function endTrivia() {
             triviaContainer.classList.add('hidden');
             triviaResults.classList.remove('hidden');
             finalScoreSpan.textContent = triviaScore;
 
-            // Guardar el puntaje en Firestore
-            try {
-                await addDoc(collection(db, PUBLIC_COLLECTIONS.TRIVIA_SCORES), {
-                    nickname: nickname,
-                    score: triviaScore,
-                    timestamp: new Date()
-                });
-            } catch (error) {
-                console.error("Error al guardar el puntaje:", error);
-            }
+            // Guardar el puntaje en el array local
+            leaderboardScores.push({ nickname: nickname, score: triviaScore });
+            renderLeaderboard();
         }
         
         /**
@@ -672,7 +535,7 @@
         }
         
         // Manejar el botón de enviar respuesta
-        submitAnswerBtn.addEventListener('click', async () => {
+        submitAnswerBtn.addEventListener('click', () => {
             const selectedOption = triviaOptions.querySelector('button.bg-red-500, button.bg-green-500')?.dataset.answer;
             if (!selectedOption) {
                 showModal("Advertencia", "Por favor, selecciona una respuesta.");
@@ -705,10 +568,11 @@
             });
         });
 
-        // Inicializar la aplicación
+        // Inicializar la aplicación al cargar la página
         document.getElementById('current-year').textContent = new Date().getFullYear();
-        initializeFirebase();
-
+        renderMusicList();
+        renderStoryMilestones();
+        renderLeaderboard();
     </script>
 </body>
 </html>
