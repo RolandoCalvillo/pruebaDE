@@ -351,11 +351,10 @@
 
             try {
                 for (const checkbox of selectedSongs) {
-                    const songId = checkbox.dataset.songId;
-                    const songToUpdate = musicData.find(s => s.id === songId);
+                    const songToUpdate = musicData.find(s => s.id === checkbox.dataset.songId);
                     if (songToUpdate) {
                         songToUpdate.votes++;
-                        votedSongs.add(songId);
+                        votedSongs.add(songToUpdate.id);
                     }
                 }
                 
